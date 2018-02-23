@@ -595,23 +595,29 @@ kaslr_init(void)
 	char *string;
 
 	if ((!machine_type("X86_64") && !machine_type("ARM64") && !machine_type("X86")) ||
-	    (kt->flags & RELOC_SET))
+	    (kt->flags & RELOC_SET)) {
+		error(FATAL, "BHUPESH A, inside kaslr_init\n");
 		return;
+	}
 
 	/*
 	 *  --kaslr=auto
 	 */
-	if ((kt->flags2 & (RELOC_AUTO|KASLR)) == (RELOC_AUTO|KASLR))
+	if ((kt->flags2 & (RELOC_AUTO|KASLR)) == (RELOC_AUTO|KASLR)) {
 		st->_stext_vmlinux = UNINITIALIZED;
+		error(FATAL, "BHUPESH B, inside kaslr_init, st->_stext_vmlinux = UNINITIALIZED\n");
+	}
 
 	if (ACTIVE() &&   /* Linux 3.15 */
 	    (symbol_value_from_proc_kallsyms("module_load_offset") != BADVAL)) {
 		kt->flags2 |= (RELOC_AUTO|KASLR);
 		st->_stext_vmlinux = UNINITIALIZED;
+		error(FATAL, "BHUPESH C, inside kaslr_init, st->_stext_vmlinux = UNINITIALIZED 2\n");
 	}
 
 	if (KDUMP_DUMPFILE() || DISKDUMP_DUMPFILE()) {
 		if ((string = pc->read_vmcoreinfo("SYMBOL(_stext)"))) {
+			error(FATAL, "BHUPESH D, inside kaslr_init\n");
 			kt->vmcoreinfo._stext_SYMBOL =
 				htol(string, RETURN_ON_ERROR, NULL);
 			free(string);
@@ -619,6 +625,7 @@ kaslr_init(void)
 
 		/* Linux 3.14 */
 		if ((string = pc->read_vmcoreinfo("KERNELOFFSET"))) {
+			error(FATAL, "BHUPESH E, inside kaslr_init\n");
 			free(string);
 			kt->flags2 |= KASLR_CHECK;
 			st->_stext_vmlinux = UNINITIALIZED;
@@ -640,6 +647,7 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 	unsigned long relocate;
 	ulong _stext_relocated;
 
+	error(FATAL, "BHUPESH 1, inside derive_kaslr_offset\n");
 	if (SADUMP_DUMPFILE()) {
 		ulong kaslr_offset = 0;
 
@@ -655,6 +663,8 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 
 	if (ACTIVE()) {
 		_stext_relocated = symbol_value_from_proc_kallsyms("_stext");
+		error(FATAL, "BHUPESH 2, inside derive_kaslr_offset, _stext_relocated:%lx\n",
+				_stext_relocated);
 		if (_stext_relocated == BADVAL)
 			return;
 	} else {
@@ -670,13 +680,15 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 	 */
 	if (st->_stext_vmlinux && (st->_stext_vmlinux != UNINITIALIZED)) {
 		relocate = st->_stext_vmlinux - _stext_relocated;
+		error(FATAL, "BHUPESH 3, inside derive_kaslr_offset, relocate:%lx\n",
+				relocate);
 		if (relocate && !(relocate & 0xfff)) {
 			kt->relocate = relocate;
 			kt->flags |= RELOC_SET;
 		}
 	}
 
-	if (CRASHDEBUG(1) && (kt->flags & RELOC_SET)) {
+	if (CRASHDEBUG(16) && (kt->flags & RELOC_SET)) {
 		fprintf(fp, "KASLR:\n");
 		fprintf(fp, "  _stext from %s: %lx\n", 
 			basename(pc->namelist), st->_stext_vmlinux);
