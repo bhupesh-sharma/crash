@@ -117,6 +117,7 @@ kernel_init()
 
 	cpu_maps_init();
 
+	fprintf(fp, "Inside kernel_init calling symbol_value for _stext\n");
 	kt->stext = symbol_value("_stext");
 	kt->etext = symbol_value("_etext");
 	get_text_init_space(); 

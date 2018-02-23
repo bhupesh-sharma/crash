@@ -667,6 +667,22 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 				_stext_relocated);
 		if (_stext_relocated == BADVAL)
 			return;
+#if 1
+		relocate = st->_stext_vmlinux - _stext_relocated;
+#else
+		if (st->_stext_vmlinux)
+			relocate = st->_stext_vmlinux - _stext_relocated;
+		else
+			relocate = _stext_relocated - st->_stext_vmlinux;
+#endif		
+		fprintf(fp, "BHUPESH 3, inside derive_kaslr_offset, relocate:%lx\n",
+				relocate);
+
+		if (relocate && !(relocate & 0xfff)) {
+			kt->relocate = relocate;
+			kt->flags |= RELOC_SET;
+		}
+
 	} else {
 		_stext_relocated = kt->vmcoreinfo._stext_SYMBOL;
 		if (_stext_relocated == 0)
@@ -688,7 +704,7 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 		}
 	}
 
-	if (CRASHDEBUG(16) && (kt->flags & RELOC_SET)) {
+	//if (CRASHDEBUG(16) && (kt->flags & RELOC_SET)) {
 		fprintf(fp, "KASLR:\n");
 		fprintf(fp, "  _stext from %s: %lx\n", 
 			basename(pc->namelist), st->_stext_vmlinux);
@@ -697,7 +713,7 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 			_stext_relocated);
 		fprintf(fp, "  relocate: %lx (%ldMB)\n",
 			kt->relocate * -1, (kt->relocate * -1) >> 20);
-	}
+	//}
 }
 
 /*
@@ -4323,6 +4339,13 @@ symbol_search(char *s)
 
 	sp_hashed = symname_hash_search(s);
 
+	if (sp_hashed)
+		fprintf(fp, "Inside symbol_search sp_hashed->name:%s, sp_hashed->value:%llx\n",
+				sp_hashed->name, sp_hashed->value);
+	else
+		fprintf(fp, "Inside symbol_search st->symtable->name:%s, st->symtable->value:%llx\n",
+				st->symtable->name, st->symtable->value);
+
         for (sp = sp_hashed ? sp_hashed : st->symtable; sp < st->symend; sp++) {
                 if (STREQ(s, sp->name)) 
                         return(sp);
@@ -5160,8 +5183,11 @@ get_symbol_data(char *symbol, long size, void *local)
         if ((sp = symbol_search(symbol))) 
                 readmem(sp->value, KVADDR, local,
                         size, symbol, FAULT_ON_ERROR);
-        else 
+        else {
+		fprintf(fp, "BHUPESH, inside get_symbol_data, symbol:%lx\n",
+				symbol);
                 error(FATAL, "cannot resolve: \"%s\"\n", symbol);
+	}
 }
 
 /*
@@ -5188,8 +5214,11 @@ symbol_value(char *symbol)
 {
         struct syment *sp;
 
-        if (!(sp = symbol_search(symbol)))
+        if (!(sp = symbol_search(symbol))) {
+		fprintf(fp, "BHUPESH, inside symbol_value, symbol:%lx\n",
+				symbol);
                 error(FATAL, "cannot resolve \"%s\"\n", symbol);
+	}
 
         return(sp->value);
 }

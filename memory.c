@@ -2123,7 +2123,7 @@ readmem(ulonglong addr, int memtype, void *buffer, long size,
 	ulonglong pseudo;
 	char *bufptr;
 
-	if (CRASHDEBUG(4))
+	//if (CRASHDEBUG(4))
 		fprintf(fp, "<readmem: %llx, %s, \"%s\", %ld, %s, %lx>\n", 
 			addr, memtype_string(memtype, 1), type, size, 
 			error_handle_string(error_handle), (ulong)buffer);
