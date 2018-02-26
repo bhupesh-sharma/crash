@@ -663,6 +663,24 @@ derive_kaslr_offset(bfd *abfd, int dynamic, bfd_byte *start, bfd_byte *end,
 			return;
 	}
 
+	/* For KASLR enabled live kernels, if vmlinux is not available
+	 * at the standard expected location, i.e
+	 * '/usr/lib/debug/lib/modules/<kernel-version>' directory,
+	 * then _stext_vmlinux will be set to NULL or UNINITIALIZED.
+	 *
+	 * Later-on this may lead to "_stext" symbol not being resolved
+	 * properly (which may lead to an ambiguous error message).
+	 *
+	 * So, error out earlier here itself, in case _stext_vmlinux
+	 * is NULL or UNINITIALIZED.
+	 */
+	if (!st->_stext_vmlinux || (st->_stext_vmlinux == UNINITIALIZED)) {
+		error(INFO, "_stext not found in vmlinux :\n"
+		      "   if running a live system -- please provide a suitable vmlinux,\n"
+		      "   otherwise -- please enter namelist argument.\n");
+		program_usage(SHORT_FORM);
+	}
+
 	/*
 	 * To avoid mistaking an mismatched kernel version with
 	 * a kaslr offset, we make sure that the offset is
