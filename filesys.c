@@ -582,6 +582,7 @@ find_booted_kernel(void)
         struct dirent *dp;
 	int found;
 
+        fprintf(fp, "\nBHUPESH inside find_booted_kernel\n");
 	pc->flags |= FINDKERNEL;
 
 	fflush(fp);
@@ -598,7 +599,7 @@ find_booted_kernel(void)
                 return FALSE;
 	}
 
-        if (CRASHDEBUG(1))
+        //if (CRASHDEBUG(1))
                 fprintf(fp, "\nfind_booted_kernel: search for [%s]\n", 
 			kt->proc_version);
 
@@ -621,14 +622,20 @@ find_booted_kernel(void)
 			if (dp->d_name[0] == '.')
 				continue;
 
+			fprintf(fp, "BHUPESH dp->d_name: %s\n", dp->d_name);
 			sprintf(kernel, "%s%s", searchdirs[i], dp->d_name);
+			fprintf(fp, "BHUPESH kernel: %s\n", kernel);
 
+			fprintf(fp, "BHUPESH %d %d %d\n",
+				mount_point(kernel), !file_readable(kernel), 
+				!is_elf_file(kernel));
 			if (mount_point(kernel) ||
 			    !file_readable(kernel) || 
-                            !is_elf_file(kernel))
+                            !is_elf_file(kernel) ||
+                            !(strcmp(dp->d_name, "vmlinux.o")))
 				continue;
 
-			if (CRASHDEBUG(1)) 
+			//if (CRASHDEBUG(1)) 
 				fprintf(fp, "find_booted_kernel: check: %s\n", 
 					kernel);
 
@@ -650,7 +657,7 @@ find_booted_kernel(void)
 				strerror(errno));
                 else {
                         strcpy(pc->namelist, kernel);
-			if (CRASHDEBUG(1))
+			//if (CRASHDEBUG(1))
 				fprintf(fp, "find_booted_kernel: found: %s\n", 
 					pc->namelist);
                         return TRUE;
