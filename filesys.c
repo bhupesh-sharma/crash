@@ -625,7 +625,7 @@ find_booted_kernel(void)
 
 			if (mount_point(kernel) ||
 			    !file_readable(kernel) || 
-                            !is_elf_file(kernel))
+			    !is_kernel(kernel))
 				continue;
 
 			if (CRASHDEBUG(1)) 
