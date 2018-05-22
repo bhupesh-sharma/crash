@@ -342,6 +342,8 @@ arm64_init(int when)
 					machdep->machspec->kimage_voffset);
 			fprintf(fp, "phys_offset: %lx\n", 
 				machdep->machspec->phys_offset);
+			fprintf(fp, "BHUPESH page_offset: %lx\n", 
+				machdep->machspec->page_offset);
 		}
 
 		break;
@@ -822,6 +824,7 @@ arm64_calc_phys_offset(void)
 {
 	struct machine_specific *ms = machdep->machspec;
 	ulong phys_offset;
+	ulong linear_start_offset;
 
 	if (machdep->flags & PHYS_OFFSET) /* --machdep override */
 		return;
@@ -842,6 +845,17 @@ arm64_calc_phys_offset(void)
 
 		if ((machdep->flags & NEW_VMEMMAP) &&
 		    ms->kimage_voffset && (sp = kernel_symbol_search("memstart_addr"))) {
+			fprintf(fp, "BHUPESH memstart_addr: %lx, *memstart_addr: %lx\n", 
+				sp->value, *(sp->value));
+			paddr =	sp->value;
+			if (READMEM(pc->mfd, &linear_start_offset, sizeof(linear_start_offset),
+			    sp->value, paddr) > 0) {
+				fprintf(fp, "BHUPESH linear_start_offset: %lx\n", 
+					linear_start_offset);
+			}
+			
+			fprintf(fp, "BHUPESH out of loop\n");
+
 			if (pc->flags & PROC_KCORE)
 				paddr = KCORE_USE_VADDR;
 			else
