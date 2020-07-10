@@ -20,7 +20,7 @@
 PROGRAM=crash
 
 #
-# Supported targets: X86 ALPHA PPC IA64 PPC64 SPARC64
+# Supported targets: X86 ALPHA ARM ARM64 PPC IA64 PPC64 SPARC64
 # TARGET and GDB_CONF_FLAGS will be configured automatically by configure
 #
 TARGET=
