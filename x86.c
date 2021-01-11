@@ -1998,11 +1998,8 @@ x86_init(int when)
 				&machdep->nr_irqs);
 		else
 			machdep->nr_irqs = 224;  /* NR_IRQS */
-		if (!machdep->hz) {
+		if (!machdep->hz)
 			machdep->hz = HZ;
-			if (THIS_KERNEL_VERSION >= LINUX(2,6,0))
-				machdep->hz = 1000;
-		}
 
 		if (machdep->flags & PAE) {
 			if (THIS_KERNEL_VERSION < LINUX(2,6,26))

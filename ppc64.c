@@ -694,11 +694,9 @@ ppc64_init(int when)
 			 */
 			BZERO(&machdep->machspec->hwintrstack,
 				NR_CPUS*sizeof(ulong));
-		if (!machdep->hz) {
+		if (!machdep->hz)
 			machdep->hz = HZ;
-			if (THIS_KERNEL_VERSION >= LINUX(2,6,0))
-				machdep->hz = 1000;
-		}
+
 		/*
 		 * IRQ stacks are introduced in 2.6 and also configurable.
 		 */

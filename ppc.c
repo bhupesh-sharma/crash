@@ -401,11 +401,8 @@ ppc_init(int when)
 					&machdep->nr_irqs);
 		else
 			machdep->nr_irqs = 512; /* NR_IRQS (at least) */
-		if (!machdep->hz) {
+		if (!machdep->hz)
 			machdep->hz = HZ;
-			if (THIS_KERNEL_VERSION >= LINUX(2,6,0))
-				machdep->hz = 1000;
-		}
 		if (symbol_exists("cur_cpu_spec")) {
 			get_symbol_data("cur_cpu_spec", sizeof(void *), &cur_cpu_spec);
 			readmem(cur_cpu_spec + MEMBER_OFFSET("cpu_spec", "cpu_user_features"), 

@@ -660,11 +660,8 @@ x86_64_init(int when)
 		machdep->show_interrupts = x86_64_show_interrupts;
 		if (THIS_KERNEL_VERSION < LINUX(2,6,24))
 			machdep->line_number_hooks = x86_64_line_number_hooks;
-		if (!machdep->hz) {
+		if (!machdep->hz)
 			machdep->hz = HZ;
-			if (THIS_KERNEL_VERSION >= LINUX(2,6,0))
-				machdep->hz = 1000;
-		}
 		machdep->section_size_bits = _SECTION_SIZE_BITS;
 		if (!machdep->max_physmem_bits) {
 			if ((string = pc->read_vmcoreinfo("NUMBER(MAX_PHYSMEM_BITS)"))) {

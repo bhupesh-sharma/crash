@@ -457,7 +457,7 @@ arm64_init(int when)
 				&machdep->nr_irqs);
 
 		if (!machdep->hz)
-			machdep->hz = 100;
+			machdep->hz = HZ;
 
 		arm64_irq_stack_init();
 		arm64_stackframe_init();

@@ -326,7 +326,7 @@ arm_init(int when)
 				   "pr_reg");
 	
 		if (!machdep->hz)
-			machdep->hz = 100;
+			machdep->hz = HZ;
 		break;
 
 	case POST_VM:
